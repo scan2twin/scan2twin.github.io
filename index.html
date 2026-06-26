@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From Point Clouds to Articulated Digital Twins</title>
+<meta name="description" content="An interactive workflow for converting brownfield production plant scans into simulation-ready articulated digital twins.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg:     #e4e4e4;
+    --page:   #ffffff;
+    --ink:    #1a1a1a;
+    --soft:   #444;
+    --faint:  #777;
+    --line:   #d8d8d8;
+    --accent: #b8430f;
+    --maxw:   820px;
+    --serif:  "Source Serif 4", Georgia, serif;
+    --sans:   "Source Sans 3", system-ui, sans-serif;
+    --mono:   "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 18px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ---- Title block ---- */
+  .titlecard {
+    background: var(--bg);
+    padding: 64px 24px 40px;
+    text-align: center;
+  }
+  .titlecard h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(28px, 4.6vw, 42px);
+    line-height: 1.2;
+    margin: 0 auto;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .subtitle {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(17px, 2.4vw, 22px);
+    color: var(--soft);
+    margin: 14px auto 26px;
+    max-width: 40ch;
+  }
+  .authors { font-size: 17px; color: var(--ink); margin: 0 0 4px; }
+  .affil { font-size: 15px; color: var(--faint); margin: 0 0 28px; }
+
+  .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 18px;
+    background: var(--page);
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
+    color: var(--ink);
+    font-size: 16px;
+    transition: border-color .15s, color .15s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+  .btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+
+  /* ---- Content column ---- */
+  .col { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+  main { background: var(--page); }
+
+  section { padding: 46px 0; }
+  section + section { border-top: 1px solid var(--line); }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(22px, 3.2vw, 28px);
+    margin: 0 0 16px;
+    color: var(--ink);
+  }
+  p { margin: 0 0 16px; color: var(--soft); }
+  p:last-child { margin-bottom: 0; }
+  .lead { color: var(--ink); }
+  strong { color: var(--ink); font-weight: 600; }
+
+  /* ---- Figures ---- */
+  .fig { margin: 0; }
+  .fig img { width: 100%; display: block; border: 1px solid var(--line); border-radius: 4px; background: #fafafa; }
+  .fig figcaption {
+    font-size: 14.5px; line-height: 1.55; color: var(--faint);
+    margin-top: 10px; text-align: center;
+  }
+  .hero-fig { max-width: 760px; margin: 0 auto; padding: 8px 24px 8px; }
+  .hero-fig.titlecard-fig { background: var(--bg); padding-bottom: 0; }
+
+  .triptych { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+  .triptych .fig img { aspect-ratio: 4/3; object-fit: contain; border: none; background: transparent; border-radius: 0; padding: 0; }
+  .triptych figcaption { margin-top: 8px; }
+
+  /* wider column for the image-heavy triptych section */
+  .col-wide { max-width: 1040px; }
+
+  /* ---- Pipeline list ---- */
+  ol.steps { margin: 0; padding: 0; counter-reset: s; list-style: none; }
+  ol.steps li {
+    display: grid; grid-template-columns: auto 1fr; gap: 16px;
+    padding: 12px 0; border-bottom: 1px solid var(--line); align-items: baseline;
+  }
+  ol.steps li:last-child { border-bottom: none; }
+  ol.steps .lbl { font-family: var(--mono); font-size: 14px; color: var(--accent); white-space: nowrap; }
+  ol.steps b { color: var(--ink); }
+
+  /* ---- BibTeX ---- */
+  pre {
+    background: #f5f5f3; border: 1px solid var(--line); border-radius: 6px;
+    padding: 16px 18px; overflow-x: auto;
+    font-family: var(--mono); font-size: 13.5px; line-height: 1.6; color: var(--soft);
+    margin: 0;
+  }
+
+  /* ---- Footer ---- */
+  footer { background: var(--bg); text-align: center; padding: 28px 24px 48px; }
+  footer p { font-size: 14px; color: var(--faint); margin: 0; }
+
+  /* placeholder for missing images */
+  .ph {
+    aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center;
+    background: #f0f0ee; border: 1px dashed #c4c4c0; border-radius: 4px;
+    font-family: var(--mono); font-size: 13px; color: #999; text-align: center; padding: 16px;
+  }
+
+  @media (max-width: 720px) {
+    body { font-size: 16px; }
+    .triptych { grid-template-columns: 1fr; }
+    section { padding: 36px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="titlecard">
+  <div class="col">
+    <h1>From Point Clouds to Articulated Digital Twins</h1>
+    <p class="subtitle">An interactive workflow for brownfield production plants</p>
+    <p class="authors">Author names redacted for peer review</p>
+    <p class="affil">University &amp; institute redacted for peer review</p>
+    <div class="buttons">
+      <a class="btn" href="#" id="paper-link">Paper
+        <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/></svg></a>
+      <a class="btn" href="#" id="arxiv-link">arXiv
+        <svg viewBox="0 0 24 24"><path d="M4 12h13"/><path d="M13 7l5 5-5 5"/></svg></a>
+      <a class="btn" href="#" id="code-link">Code
+        <svg viewBox="0 0 24 24"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<div class="hero-fig titlecard-fig">
+  <figure class="fig">
+    <img src="res/editor_app.png" alt="The node-based point cloud editor."
+         onerror="ph(this,'res/editor_app.png');">
+    <figcaption>The node-based editor used to turn raw industrial scans into simulation-ready models.</figcaption>
+  </figure>
+</div>
+
+<main>
+
+  <section>
+    <div class="col">
+      <h2>Overview</h2>
+      <p class="lead">Virtual commissioning can cut planning effort, commissioning time, and project cost &mdash; but only with a digital twin that reflects the plant's real as-built state. Roughly <strong>80% of plants are brownfield</strong>, where models are outdated or missing.</p>
+      <p>3D scanning captures geometry in minutes, yet a point cloud carries no object boundaries, part identities, or kinematics. We present an <strong>interactive workflow</strong> that turns multiple static scans into an articulated digital twin, applying human judgement where ambiguity is high and automating the geometric reasoning that is reliable.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <h2>The workflow</h2>
+      <p>Multiple scans capturing different kinematic states are combined into one model encoding part geometry, joint axes, and hierarchy. Each stage is verifiable.</p>
+      <figure class="fig" style="margin:0 0 28px">
+        <img src="res/graph.png" alt="Overview of the proposed workflow." onerror="ph(this,'res/graph.png');">
+        <figcaption>End-to-end overview: from preprocessed scans to a kinematized, mesh-reconstructed model.</figcaption>
+      </figure>
+      <ol class="steps">
+        <li><span class="lbl">01</span><span><b>Preprocess.</b> Statistical denoising and interactive cropping of irrelevant scan regions.</span></li>
+        <li><span class="lbl">02</span><span><b>Register.</b> Align scans into one frame via Kabsch and ICP from point correspondences.</span></li>
+        <li><span class="lbl">03</span><span><b>Segment.</b> Selection primitives and set operations isolate individual moving parts.</span></li>
+        <li><span class="lbl">04</span><span><b>Match.</b> Bottom-up alignment of parts across states, completing occluded geometry.</span></li>
+        <li><span class="lbl">05</span><span><b>Estimate axes.</b> Recover revolute and prismatic axes, centers, and joint ranges.</span></li>
+        <li><span class="lbl">06</span><span><b>Reconstruct &amp; export.</b> Screened Poisson meshing, then export to URDF / OpenUSD.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="wide">
+    <div class="col col-wide">
+      <h2>Completing occluded geometry</h2>
+      <p>Because moving parts are aligned across the states in which they were captured, regions hidden in one scan are filled in from another &mdash; yielding more complete part models than any single observation.</p>
+      <div class="triptych">
+        <figure class="fig"><img src="res/part_aligned_1_crop.png" alt="Shaft occluded." onerror="ph(this,'res/part_aligned_1_crop.png');"><figcaption>Shaft occluded</figcaption></figure>
+        <figure class="fig"><img src="res/part_aligned_2_crop.png" alt="Shaft captured in another state." onerror="ph(this,'res/part_aligned_2_crop.png');"><figcaption>Captured in another state</figcaption></figure>
+        <figure class="fig"><img src="res/part_aligned_3_crop.png" alt="Completed part." onerror="ph(this,'res/part_aligned_3_crop.png');"><figcaption>Completed part</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="wide">
+    <div class="col col-wide">
+      <h2>Matching across a kinematic chain</h2>
+      <p>To match parts within a kinematic chain, its parent-child hierarchy is replicated in the editor. Alignment proceeds <strong>bottom-up</strong>: the lowest-level geometry is aligned first, and each alignment rigidly pre-transforms its child parts before they are aligned in turn.</p>
+      <div class="triptych">
+        <figure class="fig"><img src="res/align_1_crop.png" alt="First alignment step." onerror="ph(this,'res/align_1_crop.png');"></figure>
+        <figure class="fig"><img src="res/align_2_crop.png" alt="Second alignment step." onerror="ph(this,'res/align_2_crop.png');"></figure>
+        <figure class="fig"><img src="res/align_3_crop.png" alt="Third alignment step." onerror="ph(this,'res/align_3_crop.png');"></figure>
+      </div>
+      <p style="text-align:center; font-size:14.5px; color:var(--faint); margin-top:10px;">Bottom-up part matching for kinematic hierarchies.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <h2>A simulation-ready twin</h2>
+      <p>Segmented part meshes are connected in a hierarchical kinematic tree encoding joint axes and limits. This maps directly onto <strong>URDF</strong> and <strong>OpenUSD</strong> and imports into commissioning software as the geometric and kinematic basis for a digital twin.</p>
+      <figure class="fig">
+        <img src="res/virtuos.png" alt="Reconstructed model imported into ISG Virtuos." onerror="ph(this,'res/virtuos.png');">
+        <figcaption>Reconstructed model of an example production plant imported into ISG&nbsp;Virtuos.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <h2>BibTeX</h2>
+<pre>@inproceedings{redacted2026pointclouds,
+  title     = {From Point Clouds to Articulated Digital Twins:
+               An Interactive Workflow for Brownfield Production Plants},
+  author    = {Redacted for Peer Review},
+  booktitle = {Redacted for Peer Review},
+  year      = {2026}
+}</pre>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>Code and data will be released open-source. Author names redacted for peer review.</p>
+</footer>
+
+<script>
+  function ph(img, path) {
+    const d = document.createElement('div');
+    d.className = 'ph';
+    d.textContent = path;
+    img.replaceWith(d);
+  }
+</script>
+
+</body>
+</html>
