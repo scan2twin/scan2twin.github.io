@@ -2,3 +2,4 @@
 # The web viewer uses the compressed res/web_model/ built by tools/build_web_model.py.
 res/model/meshes/
 point_clouds_to_articulated_digital_twins_talk.pptx
+*.pptx
