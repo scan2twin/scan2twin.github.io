@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>From Point Clouds to Articulated Digital Twins</title>
-<meta name="description" content="An interactive workflow for converting brownfield production plant scans into simulation-ready articulated digital twins.">
+<meta name="description" content="Christian Schott, Bernd Lüdemann-Ravit (SCAP 2026). An interactive workflow for converting brownfield production plant scans into simulation-ready articulated digital twins.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,8 +63,15 @@
     margin: 14px auto 26px;
     max-width: 40ch;
   }
-  .authors { font-size: 17px; color: var(--ink); margin: 0 0 4px; }
-  .affil { font-size: 15px; color: var(--faint); margin: 0 0 28px; }
+  .authors { font-size: 18px; color: var(--ink); margin: 0 0 4px; }
+  .authors .au { margin: 0 12px; white-space: nowrap; color: var(--ink); border-bottom: 1px solid #bbb; }
+  .authors .au:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
+  .affil { font-size: 15px; color: var(--faint); margin: 0 0 18px; text-wrap: balance; }
+  .venue {
+    display: inline-block; font-size: 13.5px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--accent); border-radius: 999px;
+    padding: 2px 14px; margin: 0 0 26px;
+  }
 
   .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
   .btn {
@@ -79,6 +86,7 @@
   }
   .btn:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
   .btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+  .btn.disabled { color: var(--faint); pointer-events: none; opacity: .75; }
 
   /* ---- Content column ---- */
   .col { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
@@ -97,24 +105,26 @@
   p { margin: 0 0 16px; color: var(--soft); }
   p:last-child { margin-bottom: 0; }
   .lead { color: var(--ink); }
-  strong { color: var(--ink); font-weight: 600; }
+  strong, b { color: var(--ink); font-weight: 600; }
 
   /* ---- Figures ---- */
   .fig { margin: 0; }
-  .fig img { width: 100%; display: block; border: 1px solid var(--line); border-radius: 4px; background: #fafafa; }
+  .fig img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 4px; background: #fafafa; }
   .fig figcaption {
     font-size: 14.5px; line-height: 1.55; color: var(--faint);
     margin-top: 10px; text-align: center;
   }
-  .hero-fig { max-width: 760px; margin: 0 auto; padding: 8px 24px 8px; }
-  .hero-fig.titlecard-fig { background: var(--bg); padding-bottom: 0; }
+  .fig.bare img { border: none; background: transparent; }
+  .hero-fig { max-width: 1100px; margin: 0 auto; padding: 8px 24px 8px; }
+  .hero-fig.titlecard-fig { background: var(--bg); padding-bottom: 36px; }
 
   .triptych { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
   .triptych .fig img { aspect-ratio: 4/3; object-fit: contain; border: none; background: transparent; border-radius: 0; padding: 0; }
   .triptych figcaption { margin-top: 8px; }
 
-  /* wider column for the image-heavy triptych section */
+  /* wider column for image-heavy sections */
   .col-wide { max-width: 1040px; }
+  .narrow { max-width: calc(var(--maxw) - 48px); }
 
   /* ---- Pipeline list ---- */
   ol.steps { margin: 0; padding: 0; counter-reset: s; list-style: none; }
@@ -124,7 +134,20 @@
   }
   ol.steps li:last-child { border-bottom: none; }
   ol.steps .lbl { font-family: var(--mono); font-size: 14px; color: var(--accent); white-space: nowrap; }
-  ol.steps b { color: var(--ink); }
+
+  ul.plain { margin: 0 0 16px; padding-left: 20px; color: var(--soft); }
+  ul.plain li { margin-bottom: 8px; }
+
+  /* ---- Effort breakdown ---- */
+  .effort { margin: 8px 0 0; padding: 0; list-style: none; }
+  .effort li { display: grid; grid-template-columns: 220px 1fr 52px 40px; gap: 14px; align-items: center; padding: 5px 0; font-size: 16px; }
+  .effort .name { color: var(--ink); }
+  .effort .bar { height: 12px; background: #eee; border-radius: 3px; overflow: hidden; }
+  .effort .bar span { display: block; height: 100%; background: var(--accent); opacity: .35; }
+  .effort li.top .bar span { opacity: 1; }
+  .effort .t, .effort .pc { font-family: var(--mono); font-size: 13.5px; color: var(--soft); text-align: right; font-variant-numeric: tabular-nums; }
+  .effort .pc { color: var(--faint); }
+  .effort-note { font-size: 14.5px; color: var(--faint); margin-top: 12px; }
 
   /* ---- BibTeX ---- */
   pre {
@@ -136,7 +159,28 @@
 
   /* ---- Footer ---- */
   footer { background: var(--bg); text-align: center; padding: 28px 24px 48px; }
-  footer p { font-size: 14px; color: var(--faint); margin: 0; }
+  footer p { font-size: 14px; color: var(--faint); margin: 0 auto; max-width: 70ch; }
+  footer .funder { display: block; margin: 0 auto 14px; width: 150px; height: auto; border-radius: 4px; }
+
+  /* ---- 3D viewer ---- */
+  .viewer { position: relative; aspect-ratio: 16/9; max-height: 78vh; width: 100%; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: #f3f3f1; }
+  .viewer-canvas, .viewer-canvas canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  .viewer-status { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--faint); pointer-events: none; }
+  .viewer-ui {
+    position: absolute; left: 10px; bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center;
+    background: rgba(255,255,255,.88); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; font-size: 14px; color: var(--soft);
+    opacity: 0; transition: opacity .3s;
+  }
+  .viewer.ready .viewer-ui { opacity: 1; }
+  .viewer-ui button { font: inherit; padding: 2px 12px; border: 1px solid #cfcfcf; border-radius: 4px; background: #fff; color: var(--ink); cursor: pointer; min-width: 64px; }
+  .viewer-ui button:hover { border-color: var(--accent); color: var(--accent); }
+  .viewer-ui label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .viewer-ui input[type=range] { width: 100px; accent-color: var(--accent); }
+  .viewer-ui input[type=checkbox] { accent-color: var(--accent); }
+  .hero-cap { font-size: 14.5px; line-height: 1.55; color: var(--faint); margin: 10px auto 0; text-align: center; max-width: 80ch; }
+  .viewer-legend { white-space: nowrap; }
+  .viewer-legend .sw { display: inline-block; width: 18px; height: 3px; vertical-align: middle; margin: 0 6px 0 14px; border-radius: 2px; }
+  .viewer-legend .sw.g { background: #2fbf3a; } .viewer-legend .sw.r { background: #e0312b; }
 
   /* placeholder for missing images */
   .ph {
@@ -149,6 +193,8 @@
     body { font-size: 16px; }
     .triptych { grid-template-columns: 1fr; }
     section { padding: 36px 0; }
+    .effort li { grid-template-columns: 1fr 52px 40px; row-gap: 4px; }
+    .effort .bar { grid-column: 1 / -1; grid-row: 2; }
   }
 </style>
 </head>
@@ -158,25 +204,31 @@
   <div class="col">
     <h1>From Point Clouds to Articulated Digital Twins</h1>
     <p class="subtitle">An interactive workflow for brownfield production plants</p>
-    <p class="authors">Author names redacted for peer review</p>
-    <p class="affil">University &amp; institute redacted for peer review</p>
+    <p class="authors"><a class="au" href="https://www.linkedin.com/in/c-schott/">Christian Schott</a> <a class="au" href="https://www.linkedin.com/in/bernd-l%C3%BCdemann-ravit-15265b197/">Bernd Lüdemann-Ravit</a></p>
+    <p class="affil"><a href="https://www.hs-kempten.de/forschung/forschungsinstitute/institut-fuer-produktion-und-informatik-ipi">Institute for Production and Informatics (IPI)</a>, University of Applied Sciences Kempten, Sonthofen, Germany</p>
+    <p class="venue">Accepted at SCAP 2026</p>
     <div class="buttons">
-      <a class="btn" href="#" id="paper-link">Paper
+      <a class="btn" href="point_clouds_to_articulated_digital_twins.pdf" id="paper-link">Paper
         <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/></svg></a>
-      <a class="btn" href="#" id="arxiv-link">arXiv
-        <svg viewBox="0 0 24 24"><path d="M4 12h13"/><path d="M13 7l5 5-5 5"/></svg></a>
-      <a class="btn" href="#" id="code-link">Code
+      <a class="btn" href="point_clouds_to_articulated_digital_twins_talk_compressed.pptx" id="slides-link">Slides
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1"/><path d="M12 16v4M8 20h8"/></svg></a>
+      <a class="btn disabled" href="#" id="code-link" aria-disabled="true">Code (coming soon)
         <svg viewBox="0 0 24 24"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg></a>
     </div>
   </div>
 </div>
 
-<div class="hero-fig titlecard-fig">
-  <figure class="fig">
-    <img src="res/editor_app.png" alt="The node-based point cloud editor."
-         onerror="ph(this,'res/editor_app.png');">
-    <figcaption>The node-based editor used to turn raw industrial scans into simulation-ready models.</figcaption>
-  </figure>
+<div class="hero-fig titlecard-fig" id="model">
+  <div class="viewer" id="viewer">
+    <div class="viewer-canvas"></div>
+    <div class="viewer-status">Loading 3D model…</div>
+    <div class="viewer-ui">
+      <button type="button" id="v-play">Pause</button>
+      <label><input type="checkbox" id="v-axes"> Joint axes</label>
+      <label>Motion <input type="range" id="v-amp" min="0" max="100" value="45"></label>
+    </div>
+  </div>
+  <p class="hero-cap">The articulated model of a test production plant, reconstructed with our workflow. Each joint moves within the range estimated from four scanned states. Drag to orbit, scroll to zoom, right-drag to pan. <span class="viewer-legend"><span class="sw g"></span>revolute <span class="sw r"></span>prismatic axis</span></p>
 </div>
 
 <main>
@@ -184,62 +236,100 @@
   <section>
     <div class="col">
       <h2>Overview</h2>
-      <p class="lead">Virtual commissioning can cut planning effort, commissioning time, and project cost &mdash; but only with a digital twin that reflects the plant's real as-built state. Roughly <strong>80% of plants are brownfield</strong>, where models are outdated or missing.</p>
-      <p>3D scanning captures geometry in minutes, yet a point cloud carries no object boundaries, part identities, or kinematics. We present an <strong>interactive workflow</strong> that turns multiple static scans into an articulated digital twin, applying human judgement where ambiguity is high and automating the geometric reasoning that is reliable.</p>
+      <p class="lead">Virtual commissioning cuts planning effort, commissioning time and project cost, but only if there is a digital twin that matches the plant <em>as built</em>. Around <strong>80% of production plants are brownfield</strong>, and their CAD models are incomplete, out of date or missing altogether.</p>
+      <p>A laser scanner can capture such a plant to millimetre accuracy within an hour or two. A point cloud, however, contains only geometry: it has no part boundaries, no component identities and no kinematics. Industrial scenes are also cluttered and heavily occluded, and moving parts mean that no single scan sees everything.</p>
+      <p>We present an <strong>interactive workflow</strong> that merges several static scans of a plant, each taken in a different kinematic state, into an articulated digital twin. Rather than aiming for full automation, it keeps a human in the loop where the data is ambiguous and automates the geometric reasoning that is reliable. Every stage can be checked, so the operator can guarantee the quality that downstream simulation needs.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="col col-wide">
+      <div class="narrow" style="margin:0 auto">
+        <h2>The workflow</h2>
+        <p>The input is a set of raw scans showing the plant in different static states. A sequence of interactive steps combines them into one model that encodes part geometry, joint axes and the kinematic hierarchy.</p>
+      </div>
+      <figure class="fig bare" style="margin:8px 0 28px">
+        <img src="res/graph_2.webp" width="2500" height="1500" alt="Six-panel overview of the workflow on a test production plant, numbered 1 to 6." onerror="ph(this,'res/graph_2.webp');">
+        <figcaption>The workflow applied to a test production plant. Panel numbers correspond to the steps below.</figcaption>
+      </figure>
+      <ol class="steps narrow" style="margin:0 auto">
+        <li><span class="lbl">01</span><span><b>Preprocess.</b> Statistical outlier removal suppresses the noise that reflective and transparent surfaces cause, and interactive cropping removes the parts of the 360&deg; scans that don't belong to the plant.</span></li>
+        <li><span class="lbl">02</span><span><b>Register.</b> Scans, including detailed handheld scans of single components, are brought into a common frame. From three or more point correspondences, the Kabsch algorithm gives a closed-form alignment, which ICP then refines.</span></li>
+        <li><span class="lbl">03</span><span><b>Segment.</b> Moving parts are isolated with box, polygon, sphere, DBSCAN-cluster and planar-region selections. These selections can be combined with union, intersection and difference, and organised into a hierarchy.</span></li>
+        <li><span class="lbl">04</span><span><b>Match.</b> Each part is registered across all scan states, and the observations are merged into one point cloud. Matching follows the kinematic chain from the base outward.</span></li>
+        <li><span class="lbl">05</span><span><b>Estimate axes.</b> From the relative rigid motions of each part, we fit a revolute axis (direction and centre) and a residual prismatic axis using closed-form eigen-decompositions. Joint limits come from the extreme observed states.</span></li>
+        <li><span class="lbl">06</span><span><b>Reconstruct &amp; export.</b> Screened Poisson reconstruction turns each part into a mesh, and oriented bounding boxes serve as lightweight collision proxies. The kinematic tree is then exported to URDF or OpenUSD.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="col col-wide">
+      <h2>Completing occluded geometry</h2>
+      <p>Merging every observation of a part into one point cloud has a useful side effect: a region hidden in one scan can be filled in from another state in which it was visible. The resulting part models are more complete than any single scan.</p>
+      <div class="triptych">
+        <figure class="fig"><img src="res/part_aligned_1_crop.png" alt="Prismatic shaft hidden in one scan." onerror="ph(this,'res/part_aligned_1_crop.png');"><figcaption>Prismatic shaft hidden</figcaption></figure>
+        <figure class="fig"><img src="res/part_aligned_2_crop.png" alt="Shaft visible in another state." onerror="ph(this,'res/part_aligned_2_crop.png');"><figcaption>Visible in another state</figcaption></figure>
+        <figure class="fig"><img src="res/part_aligned_3_crop.png" alt="Merged, completed part." onerror="ph(this,'res/part_aligned_3_crop.png');"><figcaption>Merged, completed part</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="col col-wide">
+      <h2>Matching along a kinematic chain</h2>
+      <p>For kinematic chains such as robot arms, the parent-child hierarchy is first rebuilt in the editor. Alignment then starts at the <strong>base</strong> and works outward. Each alignment rigidly pre-transforms all descendant parts, so each child only has to account for the motion of its own joint. These per-joint transforms feed straight into axis estimation, and exactly one axis is fitted per part.</p>
+      <div class="triptych">
+        <figure class="fig"><img src="res/align_1_crop.png" alt="Base aligned." onerror="ph(this,'res/align_1_crop.png');"></figure>
+        <figure class="fig"><img src="res/align_2_crop.png" alt="Next joint aligned." onerror="ph(this,'res/align_2_crop.png');"></figure>
+        <figure class="fig"><img src="res/align_3_crop.png" alt="Further joint aligned." onerror="ph(this,'res/align_3_crop.png');"></figure>
+      </div>
+      <p style="text-align:center; font-size:14.5px; color:var(--faint); margin-top:10px;">Sequential part matching along a kinematic chain, from the base outward (left to right).</p>
     </div>
   </section>
 
   <section>
     <div class="col">
-      <h2>The workflow</h2>
-      <p>Multiple scans capturing different kinematic states are combined into one model encoding part geometry, joint axes, and hierarchy. Each stage is verifiable.</p>
-      <figure class="fig" style="margin:0 0 28px">
-        <img src="res/graph.png" alt="Overview of the proposed workflow." onerror="ph(this,'res/graph.png');">
-        <figcaption>End-to-end overview: from preprocessed scans to a kinematized, mesh-reconstructed model.</figcaption>
-      </figure>
-      <ol class="steps">
-        <li><span class="lbl">01</span><span><b>Preprocess.</b> Statistical denoising and interactive cropping of irrelevant scan regions.</span></li>
-        <li><span class="lbl">02</span><span><b>Register.</b> Align scans into one frame via Kabsch and ICP from point correspondences.</span></li>
-        <li><span class="lbl">03</span><span><b>Segment.</b> Selection primitives and set operations isolate individual moving parts.</span></li>
-        <li><span class="lbl">04</span><span><b>Match.</b> Bottom-up alignment of parts across states, completing occluded geometry.</span></li>
-        <li><span class="lbl">05</span><span><b>Estimate axes.</b> Recover revolute and prismatic axes, centers, and joint ranges.</span></li>
-        <li><span class="lbl">06</span><span><b>Reconstruct &amp; export.</b> Screened Poisson meshing, then export to URDF / OpenUSD.</span></li>
-      </ol>
-    </div>
-  </section>
-
-  <section class="wide">
-    <div class="col col-wide">
-      <h2>Completing occluded geometry</h2>
-      <p>Because moving parts are aligned across the states in which they were captured, regions hidden in one scan are filled in from another &mdash; yielding more complete part models than any single observation.</p>
-      <div class="triptych">
-        <figure class="fig"><img src="res/part_aligned_1_crop.png" alt="Shaft occluded." onerror="ph(this,'res/part_aligned_1_crop.png');"><figcaption>Shaft occluded</figcaption></figure>
-        <figure class="fig"><img src="res/part_aligned_2_crop.png" alt="Shaft captured in another state." onerror="ph(this,'res/part_aligned_2_crop.png');"><figcaption>Captured in another state</figcaption></figure>
-        <figure class="fig"><img src="res/part_aligned_3_crop.png" alt="Completed part." onerror="ph(this,'res/part_aligned_3_crop.png');"><figcaption>Completed part</figcaption></figure>
-      </div>
-    </div>
-  </section>
-
-  <section class="wide">
-    <div class="col col-wide">
-      <h2>Matching across a kinematic chain</h2>
-      <p>To match parts within a kinematic chain, its parent-child hierarchy is replicated in the editor. Alignment proceeds <strong>bottom-up</strong>: the lowest-level geometry is aligned first, and each alignment rigidly pre-transforms its child parts before they are aligned in turn.</p>
-      <div class="triptych">
-        <figure class="fig"><img src="res/align_1_crop.png" alt="First alignment step." onerror="ph(this,'res/align_1_crop.png');"></figure>
-        <figure class="fig"><img src="res/align_2_crop.png" alt="Second alignment step." onerror="ph(this,'res/align_2_crop.png');"></figure>
-        <figure class="fig"><img src="res/align_3_crop.png" alt="Third alignment step." onerror="ph(this,'res/align_3_crop.png');"></figure>
-      </div>
-      <p style="text-align:center; font-size:14.5px; color:var(--faint); margin-top:10px;">Bottom-up part matching for kinematic hierarchies.</p>
+      <h2>Case study: where the effort goes</h2>
+      <p>We scanned a test production plant in four kinematic states, with four 360&deg; terrestrial laser scans per state. Acquisition took about 80 minutes, including setting up each state, and isn't counted below. One operator familiar with the software then built the full articulated model in <strong>under two hours</strong>.</p>
+      <ul class="effort">
+        <li><span class="name">Scan preprocessing</span><span class="bar"><span style="width:9.4%"></span></span><span class="t">10:17</span><span class="pc">9%</span></li>
+        <li><span class="name">Scan registration</span><span class="bar"><span style="width:5.4%"></span></span><span class="t">5:56</span><span class="pc">5%</span></li>
+        <li class="top"><span class="name">Part segmentation</span><span class="bar"><span style="width:69.1%"></span></span><span class="t">75:53</span><span class="pc">69%</span></li>
+        <li><span class="name">Matching &amp; axis estimation</span><span class="bar"><span style="width:10.4%"></span></span><span class="t">11:24</span><span class="pc">10%</span></li>
+        <li><span class="name">Surface reconstruction</span><span class="bar"><span style="width:5.7%"></span></span><span class="t">6:14</span><span class="pc">6%</span></li>
+      </ul>
+      <p class="effort-note">Total modelling time 109:44 (min:s). These are approximate timings from a single operator: they show relative effort, not a rigorous benchmark.</p>
+      <p>Segmentation dominates, and its share grows with the level of detail, because it scales with the number of parts while preprocessing and registration depend mainly on the number of scans. Semi-automated segmentation is therefore the most valuable target for automation. In ongoing work, we are adapting the Segment Anything Model (SAM) to 3D industrial point clouds.</p>
     </div>
   </section>
 
   <section>
     <div class="col">
       <h2>A simulation-ready twin</h2>
-      <p>Segmented part meshes are connected in a hierarchical kinematic tree encoding joint axes and limits. This maps directly onto <strong>URDF</strong> and <strong>OpenUSD</strong> and imports into commissioning software as the geometric and kinematic basis for a digital twin.</p>
+      <p>The final model is a set of part meshes connected in a hierarchical kinematic tree with joint axes and limits. This maps directly onto <strong>URDF</strong> and <strong>OpenUSD</strong>, and the model can be imported into virtual commissioning software as the geometric and kinematic basis of a digital twin.</p>
       <figure class="fig">
         <img src="res/virtuos.png" alt="Reconstructed model imported into ISG Virtuos." onerror="ph(this,'res/virtuos.png');">
-        <figcaption>Reconstructed model of an example production plant imported into ISG&nbsp;Virtuos.</figcaption>
+        <figcaption>Reconstructed model of the test production plant, imported into the virtual commissioning software ISG&nbsp;Virtuos.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="col col-wide">
+      <h2>Built as a node graph</h2>
+      <p>The workflow runs in a custom point cloud editor in which every processing step is a node in a directed graph. Execution is demand-driven: running a node queues its upstream dependencies. While one branch waits for user input, independent branches keep computing in the background.</p>
+      <ul class="plain">
+        <li><b>I/O nodes</b> convert between scan formats (.e57, .laz, .ply, .obj, and vendor-specific variants) and a single internal representation.</li>
+        <li><b>Processing nodes</b> implement algorithms such as normal estimation or planar region growing directly in the editor.</li>
+        <li><b>Interactive nodes</b> show a preview and accept edits wherever human judgement is needed.</li>
+        <li><b>Backend nodes</b> hand work to external services over TCP, for example Open3D, PCL, or Python/GPU machine learning models, so the editor stays responsive.</li>
+      </ul>
+      <p>Workflows are non-destructive: intermediate results are kept, and steps can be reordered without losing work. Once a workflow has stabilised, it can be locked into a fixed linear pipeline for end users. Components already in a model library, including articulated ones, can be fitted to the scan instead of being modelled again.</p>
+      <figure class="fig" style="margin:24px 0 0">
+        <img src="res/editor_app_v2.png" alt="The node-based point cloud editor: a 3D view with estimated joint axes above the node graph of the processing pipeline."
+             onerror="ph(this,'res/editor_app_v2.png');">
+        <figcaption>The editor's 3D view (top) shows the interactive node for part matching and axis estimation; the node graph (bottom) shows the processing pipeline behind it.</figcaption>
       </figure>
     </div>
   </section>
@@ -247,11 +337,11 @@
   <section>
     <div class="col">
       <h2>BibTeX</h2>
-<pre>@inproceedings{redacted2026pointclouds,
+<pre>@inproceedings{schott2026pointclouds,
   title     = {From Point Clouds to Articulated Digital Twins:
                An Interactive Workflow for Brownfield Production Plants},
-  author    = {Redacted for Peer Review},
-  booktitle = {Redacted for Peer Review},
+  author    = {Schott, Christian and L{\"u}demann-Ravit, Bernd},
+  booktitle = {SCAP 2026},
   year      = {2026}
 }</pre>
     </div>
@@ -260,9 +350,17 @@
 </main>
 
 <footer>
-  <p>Code and data will be released open-source. Author names redacted for peer review.</p>
+  <img class="funder" src="res/BMFTR_small.jpg" width="150" height="100" alt="Funded by the Federal Ministry of Research, Technology and Space (BMFTR)">
+  <p>This work was funded by the German Federal Ministry of Research, Technology and Space (BMFTR) under the funding code &ldquo;TwinSim4Brownfield&rdquo; 16IS24052B. The authors are responsible for the content of this publication.</p>
 </footer>
 
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module" src="viewer.js"></script>
 <script>
   function ph(img, path) {
     const d = document.createElement('div');
